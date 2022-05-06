@@ -1,4 +1,4 @@
-import React from 'react';
+import { useReducer } from 'react';
 import './App.css';
 
 const ACTIONS = {
@@ -33,33 +33,58 @@ function reducer(state, { type, payload }) {
         ...state,
         initial: `${state.initial || ''}${payload}`,
       };
-      break;
     case ACTIONS.CLEAR_DIGIT:
       return {
         initial: 0,
       };
-      break;
     case ACTIONS.ADD_OPERATION:
-      if (payload === '/')
-        return { ...state, initial: `${state.initial} ${payload} ` };
-      else if (payload === '*')
-        return { ...state, initial: `${state.initial} ${payload} ` };
-      else if (payload === '+')
-        return { ...state, initial: `${state.initial} ${payload} ` };
-      else if (payload === '-')
-        return { ...state, initial: `${state.initial} ${payload} ` };
-      break;
+      if (state.prev !== undefined) {
+        if (payload !== '-' && state.operator && !state.initial) {
+          const prevArr = state.prev.split('');
+          const firstOpIndex = prevArr.indexOf(state.operator);
+          const lastOpIndex = prevArr.lastIndexOf(state.operator);
+          if (state.operator === '-') {
+            prevArr.splice(
+              firstOpIndex - 1,
+              prevArr.length - lastOpIndex + 1,
+              payload
+            );
+          } else {
+            prevArr.splice(lastOpIndex, 1, payload);
+          }
+          return {
+            ...state,
+            prev: `${prevArr.join('')}`,
+            operator: payload,
+            initial: '',
+          };
+        }
+        return {
+          ...state,
+          prev: `${state.prev}${state.initial}${payload}`,
+          operator: payload,
+          initial: '',
+        };
+      }
+      return {
+        ...state,
+        prev: `${state.initial}${payload}`,
+        operator: payload,
+        initial: '',
+      };
     case ACTIONS.EQUALS:
       return { initial: eval(state.initial), overwrite: true };
-      break;
+    default:
+      return state;
   }
 }
 
 export default function App() {
-  const [state, dispatch] = React.useReducer(reducer, { initial: 0 });
+  const [state, dispatch] = useReducer(reducer, { initial: 0 });
   console.log(state.initial);
   return (
     <div className="kalkulator">
+      <div className="prev">{state.prev}</div>
       <div id="display">{state.initial}</div>
       <Button dispatch={dispatch} />
     </div>

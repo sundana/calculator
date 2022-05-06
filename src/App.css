@@ -14,9 +14,20 @@ body {
   margin: 40px auto;
 }
 
+.prev {
+  min-height: 60px;
+  background-color: black;
+  color: gold;
+  padding: 15px;
+  font-size: 1.4rem;
+  text-align: right;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
 #display {
   width: 100%;
-  min-height: 80px;
+  min-height: 90px;
   background-color: black;
   color: #fff;
   display: flex;
